@@ -4,10 +4,40 @@ import { tools } from "@/config/tools";
 import { categories } from "@/config/categories";
 import { blogPosts } from "@/content/blog";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = siteConfig.url.replace(/\/$/, "");
-  const lastModified = new Date();
+import { MetadataRoute } from "next";
 
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://fileconverthub.vercel.app";
+
+  const routes = [
+    "",
+    "/tools",
+    "/blog",
+    "/about",
+    "/contact",
+    "/privacy",
+    "/terms",
+    "/jpg-to-pdf",
+    "/pdf-to-jpg",
+    "/merge-pdf",
+    "/compress-pdf",
+    "/png-to-jpg",
+    "/webp-to-jpg",
+    "/resize-image",
+    "/compress-image",
+    "/word-counter",
+    "/character-counter",
+    "/case-converter",
+    "/text-cleaner",
+  ];
+
+  return routes.map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: route === "" ? 1 : 0.8,
+  }));
+}
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
