@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
     "Free Online PDF, Image & Text Tools — Fast, Secure, No Signup",
   description:
     "Free online PDF, image, and text tools. Merge PDF, compress PDF, convert JPG to PDF, resize images, count words, clean text, and more with FileConvertHub.",
-  url: process.env.NEXT_PUBLIC_APP_URL || "https://fileconverthub-final.vercel.app",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://fileconverthub.vercel.app",
   email: "vilumamtechnologies@gmail.com",
 };
 
