@@ -16,6 +16,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+export const metadata = {
+  title: "Your Site Name",
+  description: "Your site description",
+  verification: {
+    google: "FUVjP4N9UocMwWmrK23wJCfUcvsSGJvNlhnWQdyDSg0",
+  },
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fileconverthub.vercel.app"),
