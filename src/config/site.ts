@@ -3,10 +3,10 @@ import type { SiteConfig } from "@/types";
 export const siteConfig: SiteConfig = {
   name: "FileConvertHub",
   tagline:
-    "Free online file, image, PDF, and text tools — all in one place.",
+    "Free Online PDF, Image & Text Tools — Fast, Secure, No Signup",
   description:
-    "FileConvertHub offers free online tools to convert, compress, merge, and edit PDFs, images, and text. No signup required. Fast, secure, and easy to use.",
-  url: process.env.NEXT_PUBLIC_APP_URL || "https://fileconverthub.com",
+    "Free online PDF, image, and text tools. Merge PDF, compress PDF, convert JPG to PDF, resize images, count words, clean text, and more with FileConvertHub.",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://fileconverthub-final.vercel.app"",
   email: "vilumamtechnologies@gmail.com",
 };
 
