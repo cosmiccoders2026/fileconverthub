@@ -5,45 +5,74 @@ import { categories } from "@/config/categories";
 import { blogPosts } from "@/content/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = siteConfig.url;
+  const baseUrl = siteConfig.url.replace(/\/$/, "");
+  const lastModified = new Date();
 
-  const staticPages = [
-    { url: baseUrl, priority: 1 },
-    { url: `${baseUrl}/tools`, priority: 0.9 },
-    { url: `${baseUrl}/blog`, priority: 0.8 },
-    { url: `${baseUrl}/about`, priority: 0.5 },
-    { url: `${baseUrl}/contact`, priority: 0.5 },
-    { url: `${baseUrl}/privacy`, priority: 0.3 },
-    { url: `${baseUrl}/terms`, priority: 0.3 },
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/tools`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
-  const categoryPages = categories.map((cat) => ({
+  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
     url: `${baseUrl}${cat.route}`,
+    lastModified,
+    changeFrequency: "weekly",
     priority: 0.9,
   }));
 
-  const toolPages = tools.map((tool) => ({
+  const toolPages: MetadataRoute.Sitemap = tools.map((tool) => ({
     url: `${baseUrl}/tools/${tool.slug}`,
+    lastModified,
+    changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  const blogPages = blogPosts.map((post) => ({
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.publishedAt),
+    changeFrequency: "monthly",
     priority: 0.7,
   }));
-return [
-  ...staticPages,
-  ...categoryPages,
-  ...toolPages,
-  ...blogPages,
-].map((page) => ({
-  url: page.url,
-  lastModified:
-    "lastModified" in page
-      ? (page.lastModified as Date)
-      : new Date(),
-  changeFrequency: "weekly" as const,
-  priority: page.priority,
-}));
+
+  return [...staticPages, ...categoryPages, ...toolPages, ...blogPages];
 }
