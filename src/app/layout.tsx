@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   ...createMetadata({
     title: "FileConvertHub | Free Online PDF, Image & Text Tools",
     description:
-      "Use FileConvertHub for free online PDF, image, and text tools. Merge PDF, compress PDF, convert JPG to PDF, PDF to JPG, PNG to JPG, resize images, count words, clean text, and more without signup.",
+      "Free online PDF, image, and text tools.Convert,compress,merge, resize,and clean files instantly with FileConvertHub—fast,secure,and easy.",
     keywords: [
       "FileConvertHub",
       "free file converter",
