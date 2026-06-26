@@ -1,179 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+import type { MetadataRoute } from "next";
 
-  <url>
-    <loc>https://fileconverthub.vercel.app/</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://fileconverthub.vercel.app";
+  const lastModified = new Date("2026-06-25T09:28:59.812Z");
 
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  return [
+    { url: `${baseUrl}/`, lastModified, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${baseUrl}/tools`, lastModified, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/blog`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/about`, lastModified, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/contact`, lastModified, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/terms`, lastModified, changeFrequency: "yearly", priority: 0.3 },
 
-  <url>
-    <loc>https://fileconverthub.vercel.app/blog</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+    { url: `${baseUrl}/tools/merge-pdf`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/compress-pdf`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/jpg-to-pdf`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/pdf-to-jpg`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/png-to-jpg`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/webp-to-jpg`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/resize-image`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/compress-image`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/word-counter`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/case-converter`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/remove-duplicate-lines`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/tools/text-cleaner`, lastModified, changeFrequency: "weekly", priority: 0.8 },
 
-  <url>
-    <loc>https://fileconverthub.vercel.app/about</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/contact</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/privacy</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/terms</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/pdf-tools</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/image-tools</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/text-tools</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/merge-pdf</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/compress-pdf</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/jpg-to-pdf</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/pdf-to-jpg</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/png-to-jpg</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/webp-to-jpg</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/resize-image</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/compress-image</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/word-counter</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/case-converter</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/remove-duplicate-lines</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/tools/text-cleaner</loc>
-    <lastmod>2026-06-25T09:28:59.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/blog/how-to-compress-pdf-without-losing-quality</loc>
-    <lastmod>2025-03-15T00:00:00.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/blog/best-free-tools-to-convert-images-online</loc>
-    <lastmod>2025-04-02T00:00:00.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://fileconverthub.vercel.app/blog/why-fileconverthub-is-the-best-online-file-converter</loc>
-    <lastmod>2026-06-25T00:00:00.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-</urlset>
+    {
+      url: `${baseUrl}/blog/how-to-compress-pdf-without-losing-quality`,
+      lastModified: new Date("2025-03-15T00:00:00.000Z"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/best-free-tools-to-convert-images-online`,
+      lastModified: new Date("2025-04-02T00:00:00.000Z"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/why-fileconverthub-is-the-best-online-file-converter`,
+      lastModified: new Date("2026-06-25T00:00:00.000Z"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+  ];
+}
