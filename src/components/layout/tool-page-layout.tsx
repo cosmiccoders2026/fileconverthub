@@ -1,4 +1,4 @@
-import { AdSlot } from "@/components/ads/ad-slot";
+
 import { RelatedToolsSection } from "@/components/shared/related-tools";
 import type { ToolConfig } from "@/types";
 
@@ -16,7 +16,6 @@ export function ToolPageLayout({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         {/* Left ad rail - desktop only */}
         <aside className="hidden lg:col-span-2 lg:block">
-          <AdSlot variant="rail" className="sticky top-24" />
         </aside>
 
         {/* Main tool column */}
@@ -26,7 +25,7 @@ export function ToolPageLayout({
 
         {/* Right rail - ads + related tools */}
         <aside className="lg:col-span-3 space-y-6">
-          <AdSlot variant="sidebar" className="hidden lg:block sticky top-24" />
+      
           {relatedTools.length > 0 && (
             <div className="hidden lg:block">
               <RelatedToolsSection tools={relatedTools} title="Related Tools" />
