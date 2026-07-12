@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ToolPageLayout } from "@/components/layout/tool-page-layout";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolInfoSections } from "@/components/shared/tool-info-sections";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { BlogCardGrid } from "@/components/shared/blog-card";
 import { getToolBySlug, getAllToolSlugs, getRelatedTools } from "@/config/tools";
 import { getToolComponent } from "@/features/tools/tool-registry";
@@ -33,7 +32,7 @@ export async function generateMetadata({
   const tool = getToolBySlug(slug);
   if (!tool) return { title: "Tool Not Found" };
 
-  return createMetadata({
+  return createMetata({
     title: tool.seoTitle,
     description: tool.seoDescription,
     path: `/tools/${tool.slug}`,
@@ -62,7 +61,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
   return (
     <>
       <JsonLd
-        data={breadcrumbSchema([
+        data={brecrumbSchema([
           { name: "Home", url: siteConfig.url },
           { name: categoryLabel, url: `${siteConfig.url}${categoryRoute}` },
           { name: tool.name, url: toolUrl },
@@ -78,7 +77,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
       />
 
       <ToolPageLayout relatedTools={relatedTools}>
-        <Breadcrumbs
+        <Brecrumbs
           items={[
             { label: categoryLabel, href: categoryRoute },
             { label: tool.name },
@@ -98,8 +97,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
           </p>
         )}
 
-        <AdSlot variant="inline" />
-
+    
         <ToolInfoSections
           steps={tool.howToUseSteps}
           whyPoints={tool.whyUsePoints}
