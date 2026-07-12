@@ -92,7 +92,7 @@ function renderMarkdownContent(content: string) {
       flushList();
       const parts = trimmed.split(/(\[[^\]]+\]\([^)]+\))/g);
       elements.push(
-        <p key={elements.length} className="my-4 text-muted-foreground leing-relaxed">
+        <p key={elements.length} className="my-4 text-muted-foreground leading-relaxed">
           {parts.map((part, i) => {
             const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
@@ -122,7 +122,7 @@ function renderMarkdownContent(content: string) {
     } else if (trimmed) {
       flushList();
       elements.push(
-        <p key={elements.length} className="my-4 text-muted-foreground leing-relaxed">
+        <p key={elements.length} className="my-4 text-muted-foreground leading-relaxed">
           {trimmed}
         </p>
       );
@@ -145,7 +145,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <>
       <JsonLd
-data={brecrumbSchema([
+data={Breadcrumbschema([
           { name: "Home", url: siteConfig.url },
           { name: "Blog", url: `${siteConfig.url}/blog` },
           { name: post.title, url: postUrl },
@@ -162,10 +162,10 @@ data={brecrumbSchema([
       />
 
       <PageContainer size="narrow">
-        <Brecrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} />
+        <Breadcrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} />
 
         <article>
-          <heer className="mb-8 space-y-4">
+          <header className="mb-8 space-y-4">
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <span
@@ -183,9 +183,9 @@ data={brecrumbSchema([
             <div className="text-sm text-muted-foreground">
               {formatDate(post.publishedAt)} · {post.author}
             </div>
-          </heer>
+          </header>
 
-          <Slot variant="inline" className="mb-8" />
+         
 
           <div className="prose-custom">{renderMarkdownContent(post.content)}</div>
 
