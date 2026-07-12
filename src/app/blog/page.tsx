@@ -28,8 +28,7 @@ export default function BlogPage() {
         </p>
       </div>
 
-      <Slot variant="inline" className="mb-8" />
-
+ 
       <BlogCardGrid posts={sortedPosts} />
     </PageContainer>
   );
