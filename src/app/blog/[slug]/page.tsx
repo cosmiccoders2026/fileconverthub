@@ -31,7 +31,7 @@ export async function generateMetadata({
   const post = getBlogPostBySlug(slug);
   if (!post) return { title: "Article Not Found" };
 
-  return createArticleMetata({
+  return createArticleMetadata({
     title: post.title,
     description: post.description,
     path: `/blog/${post.slug}`,
