@@ -13,7 +13,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { PageContainer } from "@/components/layout/page-container";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { ToolCardGrid } from "@/components/shared/tool-card";
 import { BlogCardGrid } from "@/components/shared/blog-card";
 import { Input } from "@/components/ui/input";
@@ -99,8 +98,6 @@ export default function HomePage() {
           </div>
         </PageContainer>
       </section>
-
-      <AdSlot variant="banner" className="container mx-auto px-4 py-4" />
 
       <PageContainer>
         <h2 className="mb-6 text-2xl font-bold">Browse Free Online Tools by Category</h2>
