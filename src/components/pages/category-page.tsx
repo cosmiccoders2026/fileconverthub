@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolCardGrid } from "@/components/shared/tool-card";
 import { BlogCardGrid } from "@/components/shared/blog-card";
@@ -39,7 +38,7 @@ export function generateCategoryPage(route: string) {
     category,
     categoryTools,
     relatedPosts,
-    metadata: createMetadata({
+    metata: createMetata({
       title: category.seoTitle,
       description: category.seoDescription,
       path: category.route,
@@ -75,7 +74,7 @@ export function CategoryPageContent({ route }: { route: string }) {
           <p className="text-muted-foreground max-w-3xl">{category.intro}</p>
         </div>
 
-        <AdSlot variant="inline" className="mb-8" />
+     
 
         <section className="mb-12">
           <h2 className="mb-4 text-xl font-semibold">Available Tools</h2>
@@ -89,7 +88,7 @@ export function CategoryPageContent({ route }: { route: string }) {
           </section>
         )}
 
-        <AdSlot variant="inline" />
+      
       </PageContainer>
     </>
   );
