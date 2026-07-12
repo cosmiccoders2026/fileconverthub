@@ -77,7 +77,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
       />
 
       <ToolPageLayout relatedTools={relatedTools}>
-        <Brecrumbs
+        <Breadcrumbs
           items={[
             { label: categoryLabel, href: categoryRoute },
             { label: tool.name },
