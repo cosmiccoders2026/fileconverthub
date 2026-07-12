@@ -61,7 +61,7 @@ export default async function ToolPage({ params }: ToolPageProps) {
   return (
     <>
       <JsonLd
-        data={brecrumbSchema([
+        data={breadcrumbSchema([
           { name: "Home", url: siteConfig.url },
           { name: categoryLabel, url: `${siteConfig.url}${categoryRoute}` },
           { name: tool.name, url: toolUrl },
