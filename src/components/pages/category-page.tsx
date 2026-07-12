@@ -38,7 +38,7 @@ export function generateCategoryPage(route: string) {
     category,
     categoryTools,
     relatedPosts,
-    metata: createMetata({
+    metadata: createMetadata({
       title: category.seoTitle,
       description: category.seoDescription,
       path: category.route,
