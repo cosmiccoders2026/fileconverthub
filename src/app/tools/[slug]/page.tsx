@@ -32,7 +32,7 @@ export async function generateMetadata({
   const tool = getToolBySlug(slug);
   if (!tool) return { title: "Tool Not Found" };
 
-  return createMetata({
+  return createMetadata({
     title: tool.seoTitle,
     description: tool.seoDescription,
     path: `/tools/${tool.slug}`,
