@@ -145,7 +145,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <>
       <JsonLd
-        data={brecrumbSchema([
+data={brecrumbSchema([
           { name: "Home", url: siteConfig.url },
           { name: "Blog", url: `${siteConfig.url}/blog` },
           { name: post.title, url: postUrl },
