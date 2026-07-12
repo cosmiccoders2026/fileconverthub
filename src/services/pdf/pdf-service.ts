@@ -20,8 +20,7 @@ export async function compressPdf(
   const bytes = await file.arrayBuffer();
   const pdfDoc = await PDFDocument.load(bytes);
 
-  // pdf-lib structural optimization - re-save with compression hints
-  const saveOptions: { useObjectStreams: boolean } = {
+  const saveOptions = {
     useObjectStreams: level !== "light",
   };
 
@@ -32,35 +31,24 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
 
   for (const file of files) {
-    const bytes = await file.arrayBuffer();
-    const uint8 = new Uint8Array(bytes);
-    const isJpeg =
-      file.type === "image/jpeg" || file.name.toLowerCase().endsWith(".jpg") ||
-      file.name.toLowerCase().endsWith(".jpeg");
+    const url = URL.createObjectURL(file);
+    const img = await loadImage(url);
+    URL.revokeObjectURL(url);
 
-    let image;
-    if (isJpeg) {
-      image = await pdfDoc.embedJpg(uint8);
-    } else {
-      // Convert non-jpeg via canvas first
-      const blob = new Blob([bytes], { type: file.type });
-      const url = URL.createObjectURL(blob);
-      const img = await loadImage(url);
-      URL.revokeObjectURL(url);
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
 
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
 
-      const jpegBytes = await canvasToJpegBytes(canvas, 0.92);
-      image = await pdfDoc.embedJpg(jpegBytes);
-    }
+    const jpegBytes = await canvasToJpegBytes(canvas, 0.95);
+    const image = await pdfDoc.embedJpg(jpegBytes);
 
     const page = pdfDoc.addPage([image.width, image.height]);
+
     page.drawImage(image, {
       x: 0,
       y: 0,
@@ -75,8 +63,10 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+
     img.onload = () => resolve(img);
     img.onerror = reject;
+
     img.src = src;
   });
 }
@@ -92,6 +82,7 @@ function canvasToJpegBytes(
           reject(new Error("Failed to convert canvas"));
           return;
         }
+
         const buffer = await blob.arrayBuffer();
         resolve(new Uint8Array(buffer));
       },
@@ -114,19 +105,25 @@ export async function pdfToJpgImages(
 
   const bytes = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
-  const results: { name: string; blob: Blob }[] = [];
 
+  const results: { name: string; blob: Blob }[] = [];
   const baseName = file.name.replace(/\.pdf$/i, "");
 
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const viewport = page.getViewport({ scale });
+
     const canvas = document.createElement("canvas");
     canvas.width = viewport.width;
     canvas.height = viewport.height;
+
     const ctx = canvas.getContext("2d")!;
 
-    await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+    await page.render({
+      canvasContext: ctx,
+      viewport,
+      canvas,
+    }).promise;
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
