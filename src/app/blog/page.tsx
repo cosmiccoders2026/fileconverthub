@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/page-container";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { BlogCardGrid } from "@/components/shared/blog-card";
 import { createMetadata } from "@/lib/metadata";
 import { blogPosts } from "@/content/blog";
@@ -29,7 +28,7 @@ export default function BlogPage() {
         </p>
       </div>
 
-      <AdSlot variant="inline" className="mb-8" />
+      <Slot variant="inline" className="mb-8" />
 
       <BlogCardGrid posts={sortedPosts} />
     </PageContainer>
