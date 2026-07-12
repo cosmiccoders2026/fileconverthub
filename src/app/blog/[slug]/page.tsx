@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PageContainer } from "@/components/layout/page-container";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolCardGrid } from "@/components/shared/tool-card";
 import {
@@ -32,7 +31,7 @@ export async function generateMetadata({
   const post = getBlogPostBySlug(slug);
   if (!post) return { title: "Article Not Found" };
 
-  return createArticleMetadata({
+  return createArticleMetata({
     title: post.title,
     description: post.description,
     path: `/blog/${post.slug}`,
@@ -93,7 +92,7 @@ function renderMarkdownContent(content: string) {
       flushList();
       const parts = trimmed.split(/(\[[^\]]+\]\([^)]+\))/g);
       elements.push(
-        <p key={elements.length} className="my-4 text-muted-foreground leading-relaxed">
+        <p key={elements.length} className="my-4 text-muted-foreground leing-relaxed">
           {parts.map((part, i) => {
             const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
             if (match) {
@@ -123,7 +122,7 @@ function renderMarkdownContent(content: string) {
     } else if (trimmed) {
       flushList();
       elements.push(
-        <p key={elements.length} className="my-4 text-muted-foreground leading-relaxed">
+        <p key={elements.length} className="my-4 text-muted-foreground leing-relaxed">
           {trimmed}
         </p>
       );
@@ -146,7 +145,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <>
       <JsonLd
-        data={breadcrumbSchema([
+        data={brecrumbSchema([
           { name: "Home", url: siteConfig.url },
           { name: "Blog", url: `${siteConfig.url}/blog` },
           { name: post.title, url: postUrl },
@@ -163,10 +162,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       />
 
       <PageContainer size="narrow">
-        <Breadcrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} />
+        <Brecrumbs items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} />
 
         <article>
-          <header className="mb-8 space-y-4">
+          <heer className="mb-8 space-y-4">
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <span
@@ -184,9 +183,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="text-sm text-muted-foreground">
               {formatDate(post.publishedAt)} · {post.author}
             </div>
-          </header>
+          </heer>
 
-          <AdSlot variant="inline" className="mb-8" />
+          <Slot variant="inline" className="mb-8" />
 
           <div className="prose-custom">{renderMarkdownContent(post.content)}</div>
 
