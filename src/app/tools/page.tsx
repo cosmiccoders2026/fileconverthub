@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/page-container";
-import { AdSlot } from "@/components/ads/ad-slot";
 import { ToolCardGrid } from "@/components/shared/tool-card";
 import { createMetadata } from "@/lib/metadata";
 import { tools } from "@/config/tools";
@@ -25,7 +24,7 @@ export default function AllToolsPage() {
         </p>
       </div>
 
-      <AdSlot variant="inline" className="mb-8" />
+  
 
       {categories.map((category) => {
         const categoryTools = tools.filter((t) => t.category === category.id);
