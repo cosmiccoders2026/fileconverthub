@@ -19,7 +19,7 @@ export function AdSlot({
   };
 
   return (
-    <div
+    <div>
       className={cn(
         "flex items-center justify-center rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30",
         variantClasses[variant],
