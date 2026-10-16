@@ -1,67 +1,115 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PageContainer } from "@/components/layout/page-container";
-import { BlogCardGrid } from "@/components/shared/blog-card";
-import { createMetadata } from "@/lib/metadata";
 import { blogPosts } from "@/content/blog";
+import { siteConfig } from "@/config/site";
 
-export const metadata: Metadata = createMetadata({
-  title: "Blog & Tutorials | FileConvertHub Tool Guides",
-  description:
-    "Explore expert guides, tutorials, and practical tips on PDF compression, image formatting, text manipulation, and productivity hacks. Master your digital workflow.",
-  path: "/blog",
-  keywords: [
-    "file conversion guides", 
-    "pdf compression tips", 
-    "image optimization tutorials", 
-    "productivity blog", 
-    "text formatting tools",
-    "FileConvertHub tutorials"
-  ],
-});
+interface BlogPostPageProps {
+  params: {
+    slug: string;
+  };
+}
 
-export default function BlogPage() {
-  const sortedPosts = [...blogPosts].sort(
-    (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
+// Dynamically generate SEO metadata for each specific blog post
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const post = blogPosts.find((p) => p.slug === params.slug);
+
+  if (!post) {
+    return {};
+  }
+
+  return {
+    title: `${post.title} | ${siteConfig.name} Blog`,
+    description: post.summary,
+    openGraph: {
+      title: post.title,
+      description: post.summary,
+      type: "article",
+      publishedTime: post.publishedAt,
+      url: `${siteConfig.url}/blog/${post.slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.summary,
+    },
+  };
+}
+
+export default function BlogPostPage({ params }: BlogPostPageProps) {
+  const post = blogPosts.find((p) => p.slug === params.slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  // Generate Article Structured Data for Google Rich Snippets
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.publishedAt,
+    author: {
+      "@type": "Person",
+      name: siteConfig.author || siteConfig.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteConfig.url}/logo.png`, // Ensure you have a logo.png in your public folder
+      },
+    },
+  };
 
   return (
-    <PageContainer>
-      <header className="mb-12 space-y-5">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Resources & Tutorials
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
-          Welcome to the FileConvertHub resource center. Discover practical guides, 
-          step-by-step tutorials, and insider tips designed to streamline your digital workflow. 
-          Whether you need to learn how to securely merge sensitive PDFs, optimize high-resolution 
-          images for web performance, or clean up messy text data, our latest articles have you covered.
-        </p>
-      </header>
+    <PageContainer size="narrow">
+      {/* Inject JSON-LD into the page */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-      <main>
-        <section aria-label="Latest Blog Posts">
-          <div className="mb-6 flex items-center justify-between border-b pb-4">
-            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-              Latest Articles
-            </h2>
-            <span className="text-sm text-muted-foreground font-medium">
-              {sortedPosts.length} {sortedPosts.length === 1 ? 'post' : 'posts'}
-            </span>
-          </div>
+      <article className="mx-auto w-full max-w-3xl">
+        <header className="mb-10 flex flex-col items-start gap-4 border-b pb-8">
+          <time
+            dateTime={post.publishedAt}
+            className="text-sm font-medium text-muted-foreground"
+          >
+            {new Date(post.publishedAt).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </time>
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+            {post.title}
+          </h1>
+          <p className="text-xl text-muted-foreground">{post.summary}</p>
+        </header>
 
-          {sortedPosts.length > 0 ? (
-            <BlogCardGrid posts={sortedPosts} />
-          ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center bg-muted/30">
-              <h3 className="mb-2 text-lg font-semibold text-foreground">No posts found</h3>
-              <p className="text-muted-foreground max-w-sm">
-                Check back soon! We are actively writing new tutorials and digital workflow guides.
-              </p>
-            </div>
-          )}
-        </section>
-      </main>
+        {/* Replace this with your actual MDX or Markdown renderer component */}
+        <div className="prose prose-neutral dark:prose-invert md:prose-lg max-w-none">
+          <p>
+            <em>
+              Note: Integrate your markdown/MDX content here. If you are using next-mdx-remote 
+              or a similar library, render the compiled source inside this div.
+            </em>
+          </p>
+          
+          {/* Example of how text content naturally flows for AdSense readability */}
+          <div dangerouslySetInnerHTML={{ __html: post.content || "" }} />
+        </div>
+      </article>
     </PageContainer>
   );
+}
+
+// Generate static params for all blog posts at build time (highly recommended for performance/SEO)
+export function generateStaticParams() {
+  return blogPosts.map((post) => ({
+    slug: post.slug,
+  }));
 }
