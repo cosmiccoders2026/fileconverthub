@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import { createMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = createMetadata({
-  title: "Contact Us",
+  title: "Contact Us | Support & Feedback | FileConvertHub",
   description:
-    "Contact the FileConvertHub team for questions, feedback, or support. We're here to help with our free online tools.",
+    "Get in touch with the FileConvertHub support team. Whether you need technical assistance with our free PDF and image tools, have a feature request, or want to report a bug, we are here to help.",
   path: "/contact",
+  keywords: [
+    "contact FileConvertHub", 
+    "customer support", 
+    "file conversion help", 
+    "technical assistance", 
+    "report bug"
+  ],
 });
 
 export default function ContactLayout({
@@ -13,5 +20,5 @@ export default function ContactLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <>{children}</>;
 }
