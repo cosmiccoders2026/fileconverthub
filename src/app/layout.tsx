@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -77,10 +78,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <JsonLd data={websiteSchema()} />
-        <JsonLd data={organizationSchema()} />
-      </head>
+    <head>
+  <JsonLd data={websiteSchema()} />
+  <JsonLd data={organizationSchema()} />
+
+  {/* Google AdSense */}
+  <Script
+    id="google-adsense"
+    async
+    strategy="afterInteractive"
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7043442440396189"
+    crossOrigin="anonymous"
+  />
+</head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
