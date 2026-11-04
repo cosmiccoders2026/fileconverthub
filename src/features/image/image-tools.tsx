@@ -9,7 +9,6 @@ import {
   convertImageFormat,
   resizeImage,
   compressImage,
-  estimateCompressedSize,
 } from "@/services/image/image-service";
 import { downloadBlob, formatFileSize } from "@/lib/utils";
 
@@ -309,35 +308,251 @@ export function ResizeImageTool() {
   );
 }
 
+
 export function CompressImageTool() {
   const [files, setFiles] = useState<File[]>([]);
-  const [quality, setQuality] = useState(0.8);
+  const [quality, setQuality] = useState(0.7);
+  const [outputFormat, setOutputFormat] = useState<"webp" | "jpeg" | "png">("webp");
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState("");
+  const [results, setResults] = useState<
+    { name: string; originalSize: number; compressedSize: number; saved: number }[]
+  >([]);
 
   const handleCompress = async () => {
     if (files.length === 0) return;
+
     setStatus("processing");
     setError(null);
+    setResults([]);
+
+    const completed: {
+      name: string;
+      originalSize: number;
+      compressedSize: number;
+      saved: number;
+    }[] = [];
 
     try {
       for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        setProgress(`Compressing file ${index + 1} of ${files.length}...`);
-        const blob = await compressImage(file, quality);
-        const extension = file.type === "image/png" ? "png" : "jpg";
-        const name = file.name.replace(/\.[^.]+$/, `-compressed.${extension}`);
-        downloadBlob(blob, name);
+
+        setProgress(
+          `Compressing image ${index + 1} of ${files.length}: ${file.name}`
+        );
+
+        const compressedBlob = await compressImage(
+          file,
+          quality,
+          outputFormat
+        );
+
+        const extension =
+          outputFormat === "jpeg" ? "jpg" : outputFormat;
+
+        const name = file.name.replace(
+          /\.[^.]+$/,
+          `-compressed.${extension}`
+        );
+
+        const saved = file.size - compressedBlob.size;
+
+        completed.push({
+          name,
+          originalSize: file.size,
+          compressedSize: compressedBlob.size,
+          saved,
+        });
+
+        // Download the actual compressed Blob.
+        downloadBlob(compressedBlob, name);
+
+        // Update results with actual output size.
+        setResults([...completed]);
       }
+
       setProgress("");
       setStatus("success");
     } catch (e) {
       setProgress("");
-      setError(e instanceof Error ? e.message : "Compression failed");
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Image compression failed."
+      );
       setStatus("error");
     }
   };
+
+  const totalOriginal = results.reduce(
+    (sum, item) => sum + item.originalSize,
+    0
+  );
+
+  const totalCompressed = results.reduce(
+    (sum, item) => sum + item.compressedSize,
+    0
+  );
+
+  const totalSaved = totalOriginal - totalCompressed;
+
+  const savingsPercent =
+    totalOriginal > 0
+      ? ((totalSaved / totalOriginal) * 100).toFixed(1)
+      : "0";
+
+  return (
+    <ImageToolWrapper title="Compress Image File Size">
+      <FileDropzone
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        maxFiles={350}
+        files={files}
+        onFilesChange={(f: File[]) => {
+          setFiles(f);
+          setStatus("idle");
+          setError(null);
+          setProgress("");
+          setResults([]);
+        }}
+        label="Select images to compress"
+        hint="Supports JPG, JPEG, PNG and WebP. Select up to 350 images."
+      />
+
+      <div className="space-y-2 p-3 rounded-md border border-slate-200 bg-slate-50/50">
+        <Label className="text-xs font-medium text-slate-700">
+          Output Format
+        </Label>
+
+        <select
+          value={outputFormat}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setOutputFormat(e.target.value as "webp" | "jpeg" | "png")
+          }
+          className="w-full rounded-md border border-slate-300 bg-white p-2 text-sm"
+        >
+          <option value="webp">WebP - Recommended</option>
+          <option value="jpeg">JPEG</option>
+          <option value="png">PNG - Lossless</option>
+        </select>
+
+        <div className="flex justify-between text-xs">
+          <Label className="text-slate-700 font-medium">
+            Compression Quality
+          </Label>
+          <span className="font-mono text-slate-600">
+            {Math.round(quality * 100)}%
+          </span>
+        </div>
+
+        <input
+          type="range"
+          min={0.1}
+          max={1}
+          step={0.05}
+          value={quality}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setQuality(Number(e.target.value))
+          }
+          className="w-full accent-blue-600"
+          disabled={outputFormat === "png"}
+        />
+
+        {outputFormat === "png" && (
+          <p className="text-[11px] text-amber-700">
+            PNG uses lossless encoding. The quality slider does not apply.
+          </p>
+        )}
+
+        {outputFormat !== "png" && (
+          <p className="text-[11px] text-slate-500">
+            Lower quality generally produces smaller files.
+          </p>
+        )}
+      </div>
+
+      {progress && (
+        <p
+          className="text-xs text-slate-500 font-mono"
+          aria-live="polite"
+        >
+          {progress}
+        </p>
+      )}
+
+      <ToolStatus status={status} error={error} />
+
+      {results.length > 0 && (
+        <div className="space-y-3 rounded-md border border-slate-200 p-3">
+          <h3 className="text-sm font-semibold text-slate-900">
+            Actual Compression Results
+          </h3>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-md bg-slate-50 p-3">
+              <p className="text-xs text-slate-500">Original Size</p>
+              <p className="text-sm font-semibold">
+                {formatFileSize(totalOriginal)}
+              </p>
+            </div>
+
+            <div className="rounded-md bg-slate-50 p-3">
+              <p className="text-xs text-slate-500">Compressed Size</p>
+              <p className="text-sm font-semibold">
+                {formatFileSize(totalCompressed)}
+              </p>
+            </div>
+
+            <div className="col-span-2 rounded-md bg-blue-50 p-3">
+              <p className="text-xs text-blue-700">
+                Actual size change
+              </p>
+              <p className="text-lg font-bold text-blue-800">
+                {totalSaved >= 0 ? "Saved " : "Increased "}
+                {formatFileSize(Math.abs(totalSaved))}
+                {" "}({Math.abs(Number(savingsPercent))}%)
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {results.map((item, index) => (
+              <div
+                key={`${item.name}-${index}`}
+                className="rounded-md border border-slate-100 p-2"
+              >
+                <p className="truncate text-xs font-medium">
+                  {item.name}
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  {formatFileSize(item.originalSize)}
+                  {" → "}
+                  {formatFileSize(item.compressedSize)}
+                  {" · "}
+                  {item.saved >= 0
+                    ? `${formatFileSize(item.saved)} saved`
+                    : `${formatFileSize(Math.abs(item.saved))} larger`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Button
+        onClick={handleCompress}
+        disabled={files.length === 0 || status === "processing"}
+        className="w-full"
+      >
+        {status === "processing"
+          ? "Compressing Images..."
+          : `Compress ${files.length || ""} Images`}
+      </Button>
+    </ImageToolWrapper>
+  );
+}
+
 
   const estimatedSize =
     files.length > 0 ? estimateCompressedSize(files[0].size, quality) : 0;
