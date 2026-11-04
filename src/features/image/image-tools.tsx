@@ -539,7 +539,6 @@ export function CompressImageTool() {
           </div>
         </div>
       )}
-
       <Button
         onClick={handleCompress}
         disabled={files.length === 0 || status === "processing"}
