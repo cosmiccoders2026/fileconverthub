@@ -1,21 +1,24 @@
+import React from "react";
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <PageContainer className="text-center py-24">
-      <h1 className="text-6xl font-bold text-primary">404</h1>
-      <h2 className="mt-4 text-2xl font-semibold">Page Not Found</h2>
-      <p className="mt-2 text-muted-foreground">
-        The page you&apos;re looking for doesn&apos;t exist or has been moved.
+    <PageContainer className="text-center py-20 sm:py-28 space-y-4">
+      <p className="font-mono text-sm font-semibold text-blue-600">404 Error</p>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+        Page or Tool Not Found
+      </h1>
+      <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+        The requested address does not correspond to an available tool or article. Check the directory below to find the utility you need.
       </p>
-      <div className="mt-8 flex justify-center gap-4">
-        <Button asChild>
-          <Link href="/">Go Home</Link>
+      <div className="pt-4 flex justify-center gap-3">
+        <Button asChild size="sm">
+          <Link href="/">Return to Home</Link>
         </Button>
-        <Button variant="outline" asChild>
-          <Link href="/tools">Browse Tools</Link>
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/tools">Browse All Tools</Link>
         </Button>
       </div>
     </PageContainer>

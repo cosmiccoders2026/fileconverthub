@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageContainer } from "@/components/layout/page-container";
@@ -5,11 +6,17 @@ import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { ToolCardGrid } from "@/components/shared/tool-card";
 import { BlogCardGrid } from "@/components/shared/blog-card";
 import { createMetadata } from "@/lib/metadata";
-import { JsonLd, breadcrumbSchema } from "@/lib/schema";
+import { JsonLd, breadcrumbSchema, faqSchema } from "@/lib/schema";
 import { categories, getCategoryById } from "@/config/categories";
 import { getToolsByCategory } from "@/config/tools";
 import { blogPosts } from "@/content/blog";
 import { siteConfig } from "@/config/site";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const categoryRouteMap: Record<string, string> = {
   "/pdf-tools": "pdf",
@@ -63,32 +70,62 @@ export function CategoryPageContent({ route }: { route: string }) {
           },
         ])}
       />
+      {category.faq.length > 0 && (
+        <JsonLd data={faqSchema(category.faq)} />
+      )}
 
-      <PageContainer size="wide">
+      <PageContainer size="wide" className="py-8 sm:py-12 space-y-10">
         <Breadcrumbs items={[{ label: category.displayName }]} />
 
-        <div className="mb-8 space-y-4">
-          <h1 className="text-3xl font-bold tracking-tight">
+        <div className="border-b border-slate-200 pb-6 space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             {category.displayName}
           </h1>
-          <p className="text-muted-foreground max-w-3xl">{category.intro}</p>
+          <p className="text-sm text-slate-600 max-w-3xl leading-relaxed">
+            {category.intro}
+          </p>
         </div>
 
-     
-
-        <section className="mb-12">
-          <h2 className="mb-4 text-xl font-semibold">Available Tools</h2>
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-slate-900">
+              Available Utilities
+            </h2>
+            <span className="font-mono text-xs text-slate-400 tabular-nums">
+              {categoryTools.length} {categoryTools.length === 1 ? "tool" : "tools"}
+            </span>
+          </div>
           <ToolCardGrid tools={categoryTools} />
         </section>
 
-        {relatedPosts.length > 0 && (
-          <section className="mb-12">
-            <h2 className="mb-4 text-xl font-semibold">Related Articles</h2>
-            <BlogCardGrid posts={relatedPosts} />
+        {category.faq && category.faq.length > 0 && (
+          <section className="pt-6 border-t border-slate-200 space-y-4">
+            <h2 className="text-base font-semibold text-slate-900">
+              Frequently Asked Questions
+            </h2>
+            <Accordion type="single" collapsible className="w-full border rounded-lg bg-white px-4">
+              {category.faq.map((item, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-left text-sm font-medium py-3.5 hover:no-underline hover:text-blue-600">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-xs text-slate-600 leading-relaxed pb-3.5">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </section>
         )}
 
-      
+        {relatedPosts.length > 0 && (
+          <section className="pt-6 border-t border-slate-200 space-y-4">
+            <h2 className="text-base font-semibold text-slate-900">
+              Related Articles &amp; Documentation
+            </h2>
+            <BlogCardGrid posts={relatedPosts} />
+          </section>
+        )}
       </PageContainer>
     </>
   );

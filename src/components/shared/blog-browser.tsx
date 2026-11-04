@@ -1,10 +1,9 @@
- "use client";
-
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { BlogPost } from "@/types";
+import { formatDate } from "@/lib/utils";
 
 function readingMinutes(content: string) {
   return Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 200));
@@ -13,47 +12,140 @@ function readingMinutes(content: string) {
 export function BlogBrowser({ posts }: { posts: BlogPost[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
-  const categories = useMemo(() => ["All", ...Array.from(new Set(posts.flatMap((p) => p.tags))).sort()], [posts]);
-  const filtered = useMemo(() => posts.filter((post) => {
-    const matchesCategory = category === "All" || post.tags.includes(category);
-    const q = query.trim().toLowerCase();
-    const matchesQuery = !q || [post.title, post.description, ...post.tags].join(" ").toLowerCase().includes(q);
-    return matchesCategory && matchesQuery;
-  }), [posts, query, category]);
+
+  const categories = useMemo(
+    () => ["All", ...Array.from(new Set(posts.flatMap((p) => p.tags))).sort()],
+    [posts]
+  );
+
+  const filtered = useMemo(
+    () =>
+      posts.filter((post) => {
+        const matchesCategory =
+          category === "All" || post.tags.includes(category);
+        const q = query.trim().toLowerCase();
+        const matchesQuery =
+          !q ||
+          [post.title, post.description, ...post.tags]
+            .join(" ")
+            .toLowerCase()
+            .includes(q);
+        return matchesCategory && matchesQuery;
+      }),
+    [posts, query, category]
+  );
 
   return (
     <section className="space-y-8">
+      {/* Search & Filter Bar */}
       <div className="mx-auto max-w-2xl space-y-4">
-        <label className="relative block">
-          <span className="sr-only">Search articles</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search guides and topics..." className="h-12 pl-10" />
-        </label>
-        <div className="flex flex-wrap justify-center gap-2" aria-label="Filter articles by category">
-          {categories.map((item) => (
-            <button key={item} type="button" onClick={() => setCategory(item)} aria-pressed={category === item}
-              className={`rounded-full border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${category === item ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted"}`}>
-              {item}
-            </button>
-          ))}
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            value={query}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+            placeholder="Search guides by title, format, or keyword..."
+            className="h-10 pl-9 pr-4 text-sm"
+          />
+        </div>
+
+        {/* Clean Segmented Filter Controls */}
+        <div
+          className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-slate-100 rounded-lg"
+          aria-label="Filter guides by topic"
+        >
+          {categories.map((item) => {
+            const isActive = category === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setCategory(item)}
+                aria-pressed={isActive}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                  isActive
+                    ? "bg-white text-slate-900 shadow-sm font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {item}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <p className="text-sm text-muted-foreground" aria-live="polite">{filtered.length} {filtered.length === 1 ? "article" : "articles"}</p>
-      {filtered.length ? (
+
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3 text-xs text-slate-500">
+        <span>
+          <strong className="font-semibold text-slate-800 tabular-nums">
+            {filtered.length}
+          </strong>{" "}
+          {filtered.length === 1 ? "article" : "articles"}
+        </span>
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            className="text-blue-600 hover:underline"
+          >
+            Clear search
+          </button>
+        )}
+      </div>
+
+      {filtered.length > 0 ? (
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((post, index) => (
-            <article key={post.slug} className={`flex h-full flex-col rounded-2xl border bg-card p-6 transition-shadow hover:shadow-md ${index === 0 && !query && category === "All" ? "md:col-span-2 lg:col-span-2" : ""}`}>
-              <div className="mb-4 flex flex-wrap gap-2">{post.tags.slice(0, 2).map((tag) => <span key={tag} className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">{tag}</span>)}</div>
-              <h2 className="text-xl font-semibold leading-snug"><Link className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" href={`/blog/${post.slug}`}>{post.title}</Link></h2>
-              <p className="mt-3 flex-1 leading-relaxed text-muted-foreground">{post.description}</p>
-              <div className="mt-6 flex items-center justify-between gap-3 border-t pt-4 text-xs text-muted-foreground">
-                <time dateTime={post.publishedAt}>{new Date(`${post.publishedAt}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</time>
-                <span>{readingMinutes(post.content)} min read</span>
+          {filtered.map((post) => (
+            <article
+              key={post.slug}
+              className="flex flex-col justify-between rounded-lg border border-slate-200 bg-white p-6 transition-all hover:border-slate-300 hover:bg-slate-50/50"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="font-medium text-slate-700">{post.tags[0]}</span>
+                  <span aria-hidden="true">·</span>
+                  <time dateTime={post.publishedAt}>
+                    {formatDate(post.publishedAt)}
+                  </time>
+                  <span aria-hidden="true">·</span>
+                  <span>{readingMinutes(post.content)} min</span>
+                </div>
+
+                <h2 className="text-base font-semibold leading-snug text-slate-900">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    {post.title}
+                  </Link>
+                </h2>
+
+                <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                  {post.description}
+                </p>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                <span>{post.author}</span>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  Read guide →
+                </Link>
               </div>
             </article>
           ))}
         </div>
-      ) : <p className="rounded-xl border p-8 text-center text-muted-foreground">No articles match that search. Try another phrase or category.</p>}
+      ) : (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center space-y-2">
+          <p className="text-sm font-medium text-slate-800">
+            No matching articles found
+          </p>
+          <p className="text-xs text-slate-500">
+            Try adjusting your search query or selecting "All" categories.
+          </p>
+        </div>
+      )}
     </section>
   );
 }

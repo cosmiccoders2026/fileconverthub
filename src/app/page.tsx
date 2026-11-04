@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   Search,
   FileText,
   Image,
   Type,
-  Zap,
-  Shield,
-  Globe,
-  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Cpu,
+  DownloadCloud,
 } from "lucide-react";
 import { PageContainer } from "@/components/layout/page-container";
 import { ToolCardGrid } from "@/components/shared/tool-card";
@@ -29,227 +29,192 @@ const categoryIcons = {
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const featuredTools = getFeaturedTools();
   const recentPosts = getRecentBlogPosts(3);
 
   const filteredTools = useMemo(() => {
-    if (!search.trim()) return [];
+    let list = tools;
+    if (activeCategory !== "all") {
+      list = list.filter((tool) => tool.category === activeCategory);
+    }
+    if (!search.trim()) return list;
 
     const q = search.toLowerCase();
-
-    return tools.filter(
+    return list.filter(
       (tool) =>
         tool.name.toLowerCase().includes(q) ||
         tool.shortDescription.toLowerCase().includes(q) ||
         tool.keywords.some((keyword) => keyword.toLowerCase().includes(q))
     );
-  }, [search]);
+  }, [search, activeCategory]);
 
   return (
-    <>
-      <section className="border-b bg-gradient-to-b from-primary/5 to-background">
-        <PageContainer className="py-16 md:py-24">
-          <div className="mx-auto max-w-4xl text-center space-y-6">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-balance">
-              Simple, Reliable Online File Conversion and Text Tools
+    <div className="space-y-16 py-8 sm:py-12">
+      {/* Hero Section */}
+      <section className="border-b border-slate-200 pb-12 sm:pb-16">
+        <PageContainer>
+          <div className="mx-auto max-w-3xl text-center space-y-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-tight">
+              Browser-based file conversion and text utilities
             </h1>
 
-            <p className="text-lg text-muted-foreground text-balance">
-              Convert, compress, resize, and organize everyday files with
-              straightforward PDF, image, and text utilities. Choose a tool,
-              add your file or text, and review the result — no account required.
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Convert, compress, resize, and edit everyday documents locally on your device.
+              Files are processed in memory through client-side WebAssembly and HTML5 Canvas — zero remote uploads, no account required.
             </p>
 
-            <div className="relative mx-auto max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            {/* Quick Search */}
+            <div className="relative mx-auto max-w-lg">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
-                placeholder="Search PDF, image, and text tools..."
+                placeholder="Search utilities (e.g. merge pdf, png to jpg, word counter)..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="pl-10"
+                className="h-11 pl-10 pr-4 text-sm bg-white"
               />
             </div>
 
-            {filteredTools.length > 0 && (
-              <div className="rounded-lg border bg-card p-4 text-left">
-                <p className="mb-2 text-sm font-medium">Search Results</p>
-                <ul className="space-y-1">
-                  {filteredTools.slice(0, 5).map((tool) => (
-                    <li key={tool.slug}>
-                      <Link
-                        href={`/tools/${tool.slug}`}
-                        className="text-sm text-primary hover:underline"
-                      >
-                        {tool.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="flex flex-wrap justify-center gap-3">
+            {/* Category Quick Jumps */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setActiveCategory("all")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  activeCategory === "all"
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200/80"
+                }`}
+              >
+                All Tools ({tools.length})
+              </button>
               {categories.map((category) => (
-                <Button key={category.id} variant="outline" asChild>
-                  <Link href={category.route}>{category.displayName}</Link>
-                </Button>
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    activeCategory === category.id
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200/80"
+                  }`}
+                >
+                  {category.displayName}
+                </button>
               ))}
             </div>
           </div>
         </PageContainer>
       </section>
 
+      {/* Main Tool Grid / Search Results */}
       <PageContainer>
-        <h2 className="mb-6 text-2xl font-bold">Explore the tools</h2>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900">
+              {search.trim() ? "Search Results" : activeCategory === "all" ? "Core Utilities" : `${categories.find((c) => c.id === activeCategory)?.displayName}`}
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Showing {filteredTools.length} of {tools.length} available tools
+            </p>
+          </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => {
-            const Icon = categoryIcons[category.id as keyof typeof categoryIcons];
-            if (!Icon) return null;
-
-            return (
-              <Link
-                key={category.id}
-                href={category.route}
-                className="group rounded-xl border p-6 transition-shadow hover:shadow-md"
-              >
-                <Icon className="mb-3 h-8 w-8 text-primary" />
-
-                <h3 className="font-semibold group-hover:text-primary">
-                  {category.displayName}
-                </h3>
-
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                  {category.description.slice(0, 100)}...
-                </p>
-              </Link>
-            );
-          })}
-        </div>
-      </PageContainer>
-
-      <PageContainer>
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Popular File Conversion Tools</h2>
-
-          <Button variant="outline" asChild>
-            <Link href="/tools">View All Tools</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/tools">All Tools Catalog</Link>
+            </Button>
+          </div>
         </div>
 
-        <ToolCardGrid tools={featuredTools} />
+        {filteredTools.length > 0 ? (
+          <ToolCardGrid tools={filteredTools} />
+        ) : (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center space-y-2">
+            <p className="text-sm font-medium text-slate-800">
+              No utilities match your search
+            </p>
+            <p className="text-xs text-slate-500">
+              Try searching for "pdf", "jpg", "png", "resize", or "word counter".
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearch("");
+                setActiveCategory("all");
+              }}
+              className="mt-2"
+            >
+              Reset Filters
+            </Button>
+          </div>
+        )}
       </PageContainer>
 
-      <section className="bg-muted/30">
+      {/* Technical Architecture & Privacy Framework */}
+      <section className="border-y border-slate-200 bg-slate-50/60 py-12">
         <PageContainer>
-          <h2 className="mb-8 text-2xl font-bold text-center">
-            Why Use FileConvertHub?
-          </h2>
+          <div className="max-w-2xl mb-8 space-y-2">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900">
+              Technical Architecture &amp; Privacy
+            </h2>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              How FileConvertHub executes document operations without remote server dependency.
+            </p>
+          </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                icon: Zap,
-                title: "Fast & Instant",
-                desc: "Convert PDFs, images, and text in seconds without waiting in long queues.",
-              },
-              {
-                icon: Shield,
-                title: "Private & Secure",
-                desc: "Many tools run directly in your browser, helping your files stay private.",
-              },
-              {
-                icon: Globe,
-                title: "No Signup Required",
-                desc: "Start using online file tools immediately without creating an account.",
-              },
-              {
-                icon: Sparkles,
-                title: "Clean Output",
-                desc: "Download clean converted, compressed, or edited files without unnecessary steps.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="text-center space-y-2">
-                <item.icon className="mx-auto h-8 w-8 text-primary" />
-                <h3 className="font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
-              </div>
-            ))}
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg border border-slate-200 bg-white p-5 space-y-2.5">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-slate-900">
+                Local Client Execution
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Document merges, raster conversions, and text transformations run within your local web browser process using HTML5 Canvas and WebAssembly. No source files are sent to backend storage servers.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-5 space-y-2.5">
+              <Cpu className="h-5 w-5 text-blue-600" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-slate-900">
+                Memory-Aware Batch Processing
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Tools accommodate up to 350 files per selection and individual file sizes up to 100 MB. Processing operates sequentially in local RAM to prevent browser memory exhaustion.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-5 space-y-2.5">
+              <DownloadCloud className="h-5 w-5 text-slate-700" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-slate-900">
+                Unmarked Output
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Downloaded outputs are generated directly as raw standard formats without added watermarks, injected headers, forced account paywalls, or third-party branding.
+              </p>
+            </div>
           </div>
         </PageContainer>
       </section>
 
+      {/* Recent Technical Guides */}
       <PageContainer>
-        <h2 className="mb-8 text-2xl font-bold text-center">
-          How FileConvertHub Works
-        </h2>
-
-        <div className="grid gap-8 md:grid-cols-3">
-          {[
-            {
-              step: "1",
-              title: "Choose a Tool",
-              desc: "Select a PDF converter, image converter, compressor, text cleaner, or counter tool.",
-            },
-            {
-              step: "2",
-              title: "Upload or Paste",
-              desc: "Upload your file or paste your text directly into the tool page.",
-            },
-            {
-              step: "3",
-              title: "Download Result",
-              desc: "Get your converted, compressed, resized, or cleaned result instantly.",
-            },
-          ].map((item) => (
-            <div key={item.step} className="text-center space-y-2">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                {item.step}
-              </div>
-
-              <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </PageContainer>
-
-      <PageContainer>
-        <h2 className="mb-4 text-2xl font-bold">
-          Free PDF, Image, and Text Tools for Everyday Work
-        </h2>
-
-        <div className="space-y-4 text-muted-foreground">
-          <p>
-            FileConvertHub helps students, professionals, creators, and everyday
-            users handle common file tasks without installing extra software.
-            You can merge PDF files, compress PDF documents, convert JPG images
-            to PDF, convert PDF pages to JPG, resize images, compress images,
-            clean text, count words, and change text case from one simple online
-            platform.
-          </p>
-
-          <p>
-            The website is designed to be simple, fast, and easy to use on both
-            mobile and desktop. Whether you want to reduce file size, prepare an
-            image for upload, organize documents, or format text quickly,
-            FileConvertHub gives you practical tools that work directly from
-            your browser.
-          </p>
-        </div>
-      </PageContainer>
-
-      <PageContainer>
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">File Conversion Guides and Tips</h2>
-
-          <Button variant="outline" asChild>
-            <Link href="/blog">All Articles</Link>
+        <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900">
+              Technical Guides &amp; Documentation
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Articles explaining file format nuances, rasterization, and practical workflows
+            </p>
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/blog">Browse All Guides</Link>
           </Button>
         </div>
 
         <BlogCardGrid posts={recentPosts} />
       </PageContainer>
-    </>
+    </div>
   );
 }

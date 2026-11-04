@@ -1,22 +1,26 @@
-import { CheckCircle2 } from "lucide-react";
+import React from "react";
 
 export function WhyUseSection({
   points,
-  title = "Why Use This Tool",
+  title = "Key Specifications & Advantages",
 }: {
   points: string[];
   title?: string;
 }) {
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <ul className="space-y-3">
+    <section className="space-y-3 rounded-lg border border-slate-200 bg-white p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
+        {title}
+      </h2>
+      <ul className="space-y-2.5">
         {points.map((point, index) => (
           <li
             key={index}
-            className="flex gap-3 text-sm text-muted-foreground"
+            className="flex items-start gap-2.5 text-xs text-slate-600 leading-relaxed"
           >
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+            <span className="text-blue-600 font-bold shrink-0 leading-none pt-1">
+              —
+            </span>
             <span>{point}</span>
           </li>
         ))}

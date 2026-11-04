@@ -1,0 +1,8 @@
+{
+  "name": "FileConvertHub",
+  "description": "Fast, free, and secure in-browser PDF, image, and text file conversion and manipulation suite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
