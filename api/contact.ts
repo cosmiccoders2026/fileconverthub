@@ -1,11 +1,22 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { siteConfig } from "../src/config/site";
 
-const SECURITY_HEADERS = {
-  "X-Content-Type-Options": "nosniff",
-  "Cache-Control": "no-store, max-age=0",
-};
+const RECIPIENT_EMAIL = "vilumamtechnologies@gmail.com";
+const SENDER_EMAIL = "FileConvertHub <onboarding@resend.dev>";
+
+const MAX_BODY_SIZE = 32 * 1024;
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
+const MAX_REQUESTS = 5;
+
+const rateLimits = new Map<
+  string,
+  { count: number; expiresAt: number }
+>();
+
+function setSecurityHeaders(res: VercelResponse) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+}
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => {
@@ -16,30 +27,35 @@ function escapeHtml(value: string): string {
       '"': "&quot;",
       "'": "&#39;",
     };
+
     return entities[char];
   });
 }
 
-// Basic in-memory rate limiting.
-// Note: serverless instances may have separate counters.
-const rateLimits = new Map<
-  string,
-  { count: number; expiresAt: number }
->();
-
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Remove expired entries.
+  for (const [key, value] of rateLimits.entries()) {
+    if (now > value.expiresAt) {
+      rateLimits.delete(key);
+    }
+  }
+
   const entry = rateLimits.get(ip);
 
   if (!entry || now > entry.expiresAt) {
     rateLimits.set(ip, {
       count: 1,
-      expiresAt: now + 10 * 60 * 1000,
+      expiresAt: now + RATE_LIMIT_WINDOW,
     });
+
     return false;
   }
 
-  if (entry.count >= 5) return true;
+  if (entry.count >= MAX_REQUESTS) {
+    return true;
+  }
 
   entry.count++;
   return false;
@@ -49,73 +65,110 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-    res.setHeader(key, value);
-  });
+  setSecurityHeaders(res);
 
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
+
     return res.status(405).json({
       error: "Method not allowed. Use POST.",
     });
   }
 
   try {
+    // Check request size.
+    const contentLength = Number(
+      req.headers["content-length"] || 0
+    );
+
+    if (
+      Number.isFinite(contentLength) &&
+      contentLength > MAX_BODY_SIZE
+    ) {
+      return res.status(413).json({
+        error: "Request body exceeds the maximum allowed size.",
+      });
+    }
+
+    // Identify the client.
     const forwardedFor = req.headers["x-forwarded-for"];
+
     const ip =
       (Array.isArray(forwardedFor)
         ? forwardedFor[0]
-        : forwardedFor)?.split(",")[0]?.trim() || "unknown";
+        : forwardedFor
+      )?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "anonymous-client";
 
     if (isRateLimited(ip)) {
       res.setHeader("Retry-After", "600");
+
       return res.status(429).json({
         error: "Too many requests. Please try again later.",
       });
     }
 
-    const contentLength = Number(req.headers["content-length"] || 0);
+    // Parse request body.
+    let payload: unknown;
 
-    if (contentLength > 32 * 1024) {
-      return res.status(413).json({
-        error: "Message is too large.",
+    try {
+      payload =
+        typeof req.body === "string"
+          ? JSON.parse(req.body)
+          : req.body;
+    } catch {
+      return res.status(400).json({
+        error: "Invalid JSON request body.",
       });
     }
-
-    const payload =
-      typeof req.body === "string"
-        ? JSON.parse(req.body)
-        : req.body;
 
     if (!payload || typeof payload !== "object") {
       return res.status(400).json({
-        error: "Invalid request.",
+        error: "Invalid request data.",
       });
     }
 
-    const { name, email, subject, message, website } = payload;
+    const data = payload as Record<string, unknown>;
 
-    // Honeypot spam protection
+    const { name, email, subject, message, website } = data;
+
+    // Honeypot spam protection.
     if (typeof website === "string" && website.trim()) {
       return res.status(200).json({ success: true });
     }
 
+    // Validate required fields.
     if (
       ![name, email, subject, message].every(
         (value) =>
-          typeof value === "string" && value.trim().length > 0
+          typeof value === "string" &&
+          value.trim().length > 0
       )
     ) {
       return res.status(400).json({
-        error: "Please complete all required fields.",
+        error: "All fields are required.",
       });
     }
 
-    const cleanName = name.trim().slice(0, 120);
-    const cleanEmail = email.trim().slice(0, 254);
-    const cleanSubject = subject.trim().slice(0, 180);
-    const cleanMessage = message.trim().slice(0, 10000);
+    const cleanName = (name as string).trim();
+    const cleanEmail = (email as string).trim();
+    const cleanSubject = (subject as string).trim();
+    const cleanMessage = (message as string).trim();
 
+    // Enforce maximum lengths.
+    if (
+      cleanName.length > 120 ||
+      cleanEmail.length > 254 ||
+      cleanSubject.length > 180 ||
+      cleanMessage.length > 10000
+    ) {
+      return res.status(400).json({
+        error: "One or more fields exceed the allowed length.",
+      });
+    }
+
+    // Validate email.
     const emailRegex =
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -125,62 +178,78 @@ export default async function handler(
       });
     }
 
+    // Check Resend configuration.
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {
       return res.status(503).json({
-        error: "Email service is not configured.",
+        error: "Email delivery service is not configured.",
       });
     }
 
-    const emailResponse = await fetch(
+    // Send email through Resend.
+    const resendResponse = await fetch(
       "https://api.resend.com/emails",
       {
         method: "POST",
+
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
-          from: "FileConvertHub <onboarding@resend.dev>",
-          to: [siteConfig.email],
+          from: SENDER_EMAIL,
+          to: [RECIPIENT_EMAIL],
           reply_to: cleanEmail,
           subject: `FileConvertHub: ${cleanSubject}`,
+
           html: `
-            <h2>New FileConvertHub Inquiry</h2>
-            <p><strong>Name:</strong> ${escapeHtml(cleanName)}</p>
-            <p><strong>Email:</strong> ${escapeHtml(cleanEmail)}</p>
-            <p><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</p>
-            <p><strong>Message:</strong></p>
-            <p>${escapeHtml(cleanMessage).replace(/\r?\n/g, "<br>")}</p>
+            <div style="font-family:Arial,sans-serif;max-width:600px">
+              <h2>New FileConvertHub Inquiry</h2>
+
+              <p>
+                <strong>Name:</strong>
+                ${escapeHtml(cleanName)}
+              </p>
+
+              <p>
+                <strong>Email:</strong>
+                ${escapeHtml(cleanEmail)}
+              </p>
+
+              <p>
+                <strong>Subject:</strong>
+                ${escapeHtml(cleanSubject)}
+              </p>
+
+              <hr />
+
+              <h3>Message</h3>
+
+              <p style="white-space:pre-wrap">
+                ${escapeHtml(cleanMessage)}
+              </p>
+            </div>
           `,
         }),
       }
     );
 
-    if (!emailResponse.ok) {
-      const providerError = await emailResponse.text();
-
-      console.error(
-        "Resend delivery error:",
-        emailResponse.status,
-        providerError
-      );
-
+    if (!resendResponse.ok) {
       return res.status(502).json({
-        error: "Email provider could not deliver your message.",
+        error: "Email delivery failed. Please try again later.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Your inquiry was sent successfully.",
+      message: "Your message has been sent successfully.",
     });
-  } catch (error) {
-    console.error("Contact API error:", error);
 
+  } catch {
     return res.status(500).json({
-      error: "Unable to send your message. Please try again later.",
+      error: "Failed to send your message. Please try again later.",
     });
   }
 }
