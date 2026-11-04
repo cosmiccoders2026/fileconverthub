@@ -8,7 +8,7 @@ import { categories } from "@/config/categories";
 export const metadata: Metadata = createMetadata({
   title: "All Free Online Tools",
   description:
-    "Browse all free online tools on FileConvertHub — PDF, image, text, and AI writing utilities. No signup required.",
+    "Browse all free online tools on FileConvertHub — PDF, image, and text utilities. No signup required.",
   path: "/tools",
   keywords: ["online tools", "free tools", "file converter", "utility tools"],
 });

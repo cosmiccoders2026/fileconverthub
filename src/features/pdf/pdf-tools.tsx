@@ -29,8 +29,8 @@ export function MergePdfTool() {
       return;
     }
 
-    if (files.length > 50) {
-      setError("You can merge a maximum of 50 PDF files.");
+    if (files.length > 350) {
+      setError("You can merge a maximum of 350 PDF files per batch.");
       setStatus("error");
       return;
     }
@@ -65,7 +65,7 @@ export function MergePdfTool() {
         <FileDropzone
           accept=".pdf,application/pdf"
           multiple
-          maxFiles={50}
+          maxFiles={350}
           files={files}
           onFilesChange={(f) => {
             setFiles(f);
@@ -73,7 +73,7 @@ export function MergePdfTool() {
             setError(null);
           }}
           label="Drop PDF files here or click to upload"
-          hint="Upload 2 to 50 PDF files. Reorder before merging."
+          hint="Select 2 to 350 PDF files and reorder them before merging. Very large batches may exceed your device's available memory; smaller batches are more reliable."
         />
 
         <ToolStatus status={status} error={error} />
@@ -196,8 +196,8 @@ export function JpgToPdfTool() {
       return;
     }
 
-    if (files.length > 50) {
-      setError("You can convert a maximum of 50 photos at a time.");
+    if (files.length > 350) {
+      setError("You can convert a maximum of 350 photos per batch.");
       setStatus("error");
       return;
     }
@@ -238,7 +238,7 @@ export function JpgToPdfTool() {
         <FileDropzone
           accept=".jpg,.jpeg,image/jpeg"
           multiple
-          maxFiles={50}
+          maxFiles={350}
           files={files}
           onFilesChange={(f) => {
             setFiles(f);
@@ -246,7 +246,7 @@ export function JpgToPdfTool() {
             setError(null);
           }}
           label="Drop JPG/JPEG photos here"
-          hint="Upload up to 50 photos. They will be combined into one PDF."
+          hint="Select up to 350 photos. They will be combined into one PDF; very large batches may exceed available device memory."
         />
 
         <ToolStatus status={status} error={error} />

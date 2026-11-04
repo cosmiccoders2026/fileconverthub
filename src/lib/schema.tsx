@@ -82,7 +82,7 @@ export function articleSchema({
     url,
     datePublished: publishedAt,
     author: {
-      "@type": "Person",
+      "@type": "Organization",
       name: author,
     },
     publisher: {

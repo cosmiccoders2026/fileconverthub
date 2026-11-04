@@ -21,7 +21,7 @@ export const categories: CategoryConfig[] = [
       {
         question: "Is my PDF data secure?",
         answer:
-          "Most PDF tools process files directly in your browser. Your documents are not uploaded to our servers unless you use an AI writing tool that requires server processing.",
+          "The current PDF tools process selected files in your browser. Processing uses device memory, so very large documents or batches may not complete on every device.",
       },
       {
         question: "Do converted PDFs have watermarks?",
@@ -31,7 +31,7 @@ export const categories: CategoryConfig[] = [
       {
         question: "What is the maximum file size?",
         answer:
-          "File size limits depend on your device memory. For most users, files up to 50MB work well. Very large files may take longer to process.",
+          "The file picker accepts files up to 100 MB each and multi-file selections up to 250 MB combined. Actual processing capacity depends on your browser and available device memory.",
       },
     ],
     featuredToolSlugs: ["merge-pdf", "compress-pdf", "pdf-to-jpg", "jpg-to-pdf"],
@@ -43,7 +43,7 @@ export const categories: CategoryConfig[] = [
     intro:
       "Convert, resize, and compress images online. Support for PNG, JPG, WebP, and more — all processed in your browser for maximum privacy.",
     description:
-      "Free image tools to convert PNG and WebP to JPG, resize images to exact dimensions, and compress photos without losing noticeable quality.",
+      "Free image tools to convert PNG and WebP to JPG, resize images to exact dimensions, and compress photos with adjustable settings. Review the output to confirm that important details remain clear.",
     seoTitle: "Free Image Tools Online — Convert, Resize & Compress Images",
     seoDescription:
       "Free online image tools to convert PNG to JPG, WebP to JPG, resize images, and compress photos. Browser-based, no signup, no watermarks.",

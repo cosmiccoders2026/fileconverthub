@@ -38,17 +38,24 @@ export function PngToJpgTool() {
   const [quality, setQuality] = useState(0.92);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState("");
 
   const handleConvert = async () => {
     if (files.length === 0) return;
     setStatus("processing");
     setError(null);
     try {
-      const blob = await convertImageFormat(files[0], "jpeg", quality);
-      const name = files[0].name.replace(/\.png$/i, ".jpg");
-      downloadBlob(blob, name);
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        setProgress(`Converting ${index + 1} of ${files.length}...`);
+        const blob = await convertImageFormat(file, "jpeg", quality);
+        const name = file.name.replace(/\.png$/i, ".jpg");
+        downloadBlob(blob, name);
+      }
+      setProgress("");
       setStatus("success");
     } catch (e) {
+      setProgress("");
       setError(e instanceof Error ? e.message : "Conversion failed");
       setStatus("error");
     }
@@ -58,9 +65,12 @@ export function PngToJpgTool() {
     <ImageToolWrapper title="PNG to JPG">
       <FileDropzone
         accept=".png,image/png"
+        multiple
+        maxFiles={350}
         files={files}
-        onFilesChange={(f) => { setFiles(f); setStatus("idle"); }}
-        label="Drop PNG file here"
+        onFilesChange={(f) => { setFiles(f); setStatus("idle"); setError(null); setProgress(""); }}
+        label="Drop PNG files here or click to select"
+        hint="Up to 350 files per batch. Files are processed one at a time; your browser may ask permission for multiple downloads."
       />
       <div className="space-y-2">
         <Label>Quality: {Math.round(quality * 100)}%</Label>
@@ -74,6 +84,7 @@ export function PngToJpgTool() {
           className="w-full"
         />
       </div>
+      {progress && <p className="text-sm text-muted-foreground" aria-live="polite">{progress}</p>}
       <ToolStatus status={status} error={error} />
       <Button onClick={handleConvert} disabled={files.length === 0 || status === "processing"} className="w-full">
         Convert to JPG
@@ -87,17 +98,24 @@ export function WebpToJpgTool() {
   const [quality, setQuality] = useState(0.92);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState("");
 
   const handleConvert = async () => {
     if (files.length === 0) return;
     setStatus("processing");
     setError(null);
     try {
-      const blob = await convertImageFormat(files[0], "jpeg", quality);
-      const name = files[0].name.replace(/\.webp$/i, ".jpg");
-      downloadBlob(blob, name);
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        setProgress(`Converting ${index + 1} of ${files.length}...`);
+        const blob = await convertImageFormat(file, "jpeg", quality);
+        const name = file.name.replace(/\.webp$/i, ".jpg");
+        downloadBlob(blob, name);
+      }
+      setProgress("");
       setStatus("success");
     } catch (e) {
+      setProgress("");
       setError(e instanceof Error ? e.message : "Conversion failed");
       setStatus("error");
     }
@@ -107,9 +125,12 @@ export function WebpToJpgTool() {
     <ImageToolWrapper title="WebP to JPG">
       <FileDropzone
         accept=".webp,image/webp"
+        multiple
+        maxFiles={350}
         files={files}
-        onFilesChange={(f) => { setFiles(f); setStatus("idle"); }}
-        label="Drop WebP file here"
+        onFilesChange={(f) => { setFiles(f); setStatus("idle"); setError(null); setProgress(""); }}
+        label="Drop WebP files here or click to select"
+        hint="Up to 350 files per batch. Files are processed one at a time; your browser may ask permission for multiple downloads."
       />
       <div className="space-y-2">
         <Label>Quality: {Math.round(quality * 100)}%</Label>
@@ -123,6 +144,7 @@ export function WebpToJpgTool() {
           className="w-full"
         />
       </div>
+      {progress && <p className="text-sm text-muted-foreground" aria-live="polite">{progress}</p>}
       <ToolStatus status={status} error={error} />
       <Button onClick={handleConvert} disabled={files.length === 0 || status === "processing"} className="w-full">
         Convert to JPG
@@ -138,18 +160,25 @@ export function ResizeImageTool() {
   const [maintainAspect, setMaintainAspect] = useState(true);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState("");
 
   const handleResize = async () => {
     if (files.length === 0) return;
     setStatus("processing");
     setError(null);
     try {
-      const blob = await resizeImage(files[0], width, height, maintainAspect);
-      const ext = files[0].name.split(".").pop() || "jpg";
-      const name = files[0].name.replace(/\.[^.]+$/, `-resized.${ext}`);
-      downloadBlob(blob, name);
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        setProgress(`Resizing ${index + 1} of ${files.length}...`);
+        const blob = await resizeImage(file, width, height, maintainAspect);
+        const extension = file.type === "image/png" ? "png" : "jpg";
+        const name = file.name.replace(/\.[^.]+$/, `-resized.${extension}`);
+        downloadBlob(blob, name);
+      }
+      setProgress("");
       setStatus("success");
     } catch (e) {
+      setProgress("");
       setError(e instanceof Error ? e.message : "Resize failed");
       setStatus("error");
     }
@@ -159,9 +188,12 @@ export function ResizeImageTool() {
     <ImageToolWrapper title="Resize Image">
       <FileDropzone
         accept="image/*"
+        multiple
+        maxFiles={350}
         files={files}
-        onFilesChange={(f) => { setFiles(f); setStatus("idle"); }}
-        label="Drop image here"
+        onFilesChange={(f) => { setFiles(f); setStatus("idle"); setError(null); setProgress(""); }}
+        label="Drop image files here or click to select"
+        hint="Up to 350 files per batch. Files are processed one at a time; your browser may ask permission for multiple downloads."
       />
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -177,6 +209,7 @@ export function ResizeImageTool() {
         <input type="checkbox" checked={maintainAspect} onChange={(e) => setMaintainAspect(e.target.checked)} />
         Maintain aspect ratio
       </label>
+      {progress && <p className="text-sm text-muted-foreground" aria-live="polite">{progress}</p>}
       <ToolStatus status={status} error={error} />
       <Button onClick={handleResize} disabled={files.length === 0 || status === "processing"} className="w-full">
         Resize Image
@@ -190,18 +223,25 @@ export function CompressImageTool() {
   const [quality, setQuality] = useState(0.8);
   const [status, setStatus] = useState<"idle" | "processing" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState("");
 
   const handleCompress = async () => {
     if (files.length === 0) return;
     setStatus("processing");
     setError(null);
     try {
-      const blob = await compressImage(files[0], quality);
-      const ext = files[0].name.split(".").pop() || "jpg";
-      const name = files[0].name.replace(/\.[^.]+$/, `-compressed.${ext}`);
-      downloadBlob(blob, name);
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        setProgress(`Compressing ${index + 1} of ${files.length}...`);
+        const blob = await compressImage(file, quality);
+        const extension = file.type === "image/png" ? "png" : "jpg";
+        const name = file.name.replace(/\.[^.]+$/, `-compressed.${extension}`);
+        downloadBlob(blob, name);
+      }
+      setProgress("");
       setStatus("success");
     } catch (e) {
+      setProgress("");
       setError(e instanceof Error ? e.message : "Compression failed");
       setStatus("error");
     }
@@ -215,9 +255,12 @@ export function CompressImageTool() {
     <ImageToolWrapper title="Compress Image">
       <FileDropzone
         accept="image/*"
+        multiple
+        maxFiles={350}
         files={files}
-        onFilesChange={(f) => { setFiles(f); setStatus("idle"); }}
-        label="Drop image here"
+        onFilesChange={(f) => { setFiles(f); setStatus("idle"); setError(null); setProgress(""); }}
+        label="Drop image files here or click to select"
+        hint="Up to 350 files per batch. Files are processed one at a time; your browser may ask permission for multiple downloads."
       />
       <div className="space-y-2">
         <Label>Quality: {Math.round(quality * 100)}%</Label>
@@ -236,6 +279,7 @@ export function CompressImageTool() {
           </p>
         )}
       </div>
+      {progress && <p className="text-sm text-muted-foreground" aria-live="polite">{progress}</p>}
       <ToolStatus status={status} error={error} />
       <Button onClick={handleCompress} disabled={files.length === 0 || status === "processing"} className="w-full">
         Compress Image

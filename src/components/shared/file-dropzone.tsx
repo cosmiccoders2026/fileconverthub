@@ -18,20 +18,50 @@ interface FileDropzoneProps {
 export function FileDropzone({
   accept,
   multiple = false,
-  maxFiles = 10,
+  maxFiles = 350,
   files,
   onFilesChange,
   label = "Drop files here or click to upload",
   hint,
 }: FileDropzoneProps) {
   const [dragOver, setDragOver] = useState(false);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
 
   const handleFiles = useCallback(
     (newFiles: FileList | null) => {
       if (!newFiles) return;
       const fileArray = Array.from(newFiles);
+      setSelectionError(null);
+      const tokens = (accept || "").split(",").map((part) => part.trim().toLowerCase()).filter(Boolean);
+      const invalidType = fileArray.find((file) => {
+        if (!tokens.length) return false;
+        const extension = `.${file.name.split(".").pop()?.toLowerCase() || ""}`;
+        return !tokens.some((token) =>
+          token.startsWith(".") ? extension === token :
+          token.endsWith("/*") ? file.type.startsWith(token.slice(0, -1)) :
+          file.type.toLowerCase() === token
+        );
+      });
+      if (invalidType) {
+        setSelectionError(`${invalidType.name} is not a supported file type for this tool.`);
+        return;
+      }
+      const oversized = fileArray.find((file) => file.size > 100 * 1024 * 1024);
+      if (oversized) {
+        setSelectionError(`${oversized.name} is larger than the 100 MB per-file limit. Choose a smaller file.`);
+        return;
+      }
       if (multiple) {
-        const combined = [...files, ...fileArray].slice(0, maxFiles);
+        const combined = [...files, ...fileArray];
+        if (combined.length > maxFiles) {
+          setSelectionError(`You can select up to ${maxFiles} files for this operation. Try a smaller batch if your device has limited memory.`);
+          return;
+        }
+        const totalBytes = combined.reduce((total, file) => total + file.size, 0);
+        if (totalBytes > 250 * 1024 * 1024) {
+          setSelectionError("The combined selection is larger than 250 MB. Choose a smaller batch to reduce memory pressure.");
+          return;
+        }
         onFilesChange(combined);
       } else {
         onFilesChange(fileArray.slice(0, 1));
@@ -84,12 +114,19 @@ export function FileDropzone({
           type="file"
           accept={accept}
           multiple={multiple}
-          className="absolute inset-0 cursor-pointer opacity-0"
-          onChange={(e) => handleFiles(e.target.files)}
+          aria-label={label}
+          className="absolute inset-0 cursor-pointer opacity-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          onChange={(e) => {
+            handleFiles(e.target.files);
+            e.currentTarget.value = "";
+          }}
         />
       </div>
 
+      {selectionError && <p role="alert" className="text-sm text-destructive">{selectionError}</p>}
       {files.length > 0 && (
+        <>
+        <p className="text-xs text-muted-foreground" aria-live="polite">{files.length} file(s) selected</p>
         <ul className="space-y-2">
           {files.map((file, index) => (
             <li
@@ -139,6 +176,7 @@ export function FileDropzone({
             </li>
           ))}
         </ul>
+        </>
       )}
     </div>
   );

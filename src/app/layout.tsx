@@ -18,12 +18,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://fileconverthub.vercel.app"),
+  metadataBase: new URL(siteConfig.url),
 
   ...createMetadata({
     title: "FileConvertHub | Free Online PDF, Image & Text Tools",
     description:
-      "Free online PDF, image, and text tools.Convert,compress,merge, resize,and clean files instantly with FileConvertHub—fast,secure,and easy.",
+      "Use straightforward online tools to merge and compress PDFs, convert and resize images, count words, and clean text with FileConvertHub.",
     keywords: [
       "FileConvertHub",
       "free file converter",

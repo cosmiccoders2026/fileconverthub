@@ -10,7 +10,7 @@ import { siteConfig } from "@/config/site";
 
 export default function ContactPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", website: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,15 +25,15 @@ export default function ContactPage() {
 
       if (response.ok) {
         setStatus("success");
-        setForm({ name: "", email: "", message: "" });
+        setForm({ name: "", email: "", subject: "", message: "", website: "" });
       } else {
         setStatus("error");
       }
     } catch {
       // Fallback to mailto if API fails or network error occurs
-      const subject = encodeURIComponent(`Contact from ${form.name}`);
+      const subject = encodeURIComponent(form.subject || `Contact from ${form.name}`);
       const body = encodeURIComponent(
-        `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
+        `Name: ${form.name}\nEmail: ${form.email}\nSubject: ${form.subject}\n\n${form.message}`
       );
       window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
       setStatus("success");
@@ -78,7 +78,7 @@ export default function ContactPage() {
           <section className="rounded-xl bg-muted p-6 text-sm text-muted-foreground">
             <h3 className="mb-2 font-semibold text-foreground text-base">Support Expectations</h3>
             <p className="mb-4">
-              We aim to respond to all inquiries within <strong>24-48 business hours</strong>. 
+              We review messages and use the contact details you provide to respond when possible. We do not guarantee a response time. 
             </p>
             <p>
               <em>Note: Because we prioritize your privacy and process most files locally in your browser, we do not store your files on our servers and cannot help you recover lost documents.</em>
@@ -91,6 +91,7 @@ export default function ContactPage() {
           <h2 className="mb-6 text-xl font-bold text-foreground">Send a Message</h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">
+            <p className="text-sm text-muted-foreground">Fields marked as required must be completed. Please do not include passwords or sensitive personal information.</p>
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -98,6 +99,7 @@ export default function ContactPage() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
+                maxLength={120}
                 placeholder="Your name"
                 disabled={status === "sending"}
               />
@@ -111,9 +113,28 @@ export default function ContactPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
+                maxLength={254}
                 placeholder="you@example.com"
                 disabled={status === "sending"}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject</Label>
+              <Input
+                id="subject"
+                value={form.subject}
+                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                required
+                maxLength={180}
+                placeholder="What is your message about?"
+                disabled={status === "sending"}
+              />
+            </div>
+
+            <div aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">
+              <label htmlFor="website">Leave this field empty</label>
+              <input id="website" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
             </div>
 
             <div className="space-y-2">
@@ -123,6 +144,7 @@ export default function ContactPage() {
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 required
+                maxLength={10000}
                 placeholder="How can we help?"
                 className="min-h-[150px]"
                 disabled={status === "sending"}

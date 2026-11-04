@@ -180,8 +180,10 @@ data={breadcrumbSchema([
               {post.title}
             </h1>
             <p className="text-muted-foreground">{post.description}</p>
-            <div className="text-sm text-muted-foreground">
-              {formatDate(post.publishedAt)} · {post.author}
+            <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
+              <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+              <span>{post.author}</span>
+              <span>{Math.max(1, Math.ceil(post.content.trim().split(/\s+/).length / 200))} min read</span>
             </div>
           </header>
 

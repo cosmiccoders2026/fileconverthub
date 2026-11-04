@@ -2,12 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-padding-top: 5rem;
+}
+
 body {
   @apply antialiased;
-  background-color: white;
-  color: black;
+  background: #fff;
+  color: #172033;
+  font-feature-settings: "ss01" on, "cv11" on;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(37 99 235 / 18%);
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
 }
 
 .text-balance {
   text-wrap: balance;
+}
+
+.prose-custom {
+  color: hsl(var(--muted-foreground));
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.prose-custom h2,
+.prose-custom h3 {
+  color: hsl(var(--foreground));
+  line-height: 1.3;
+}
+
+.prose-custom a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

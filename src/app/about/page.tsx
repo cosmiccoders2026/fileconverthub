@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = createMetadata({
   title: "About FileConvertHub | Free PDF, Image & Text Tools",
   description:
-    "Learn about FileConvertHub — your trusted, free online platform for secure PDF processing, image conversion, and text formatting. No signup, no watermarks.",
+    "Learn about FileConvertHub — an online platform for PDF, image, and text utilities, image conversion, and text formatting. No signup, no watermarks.",
   path: "/about",
 });
 
@@ -76,7 +76,7 @@ export default function AboutPage() {
               <strong className="text-foreground">Professional Quality:</strong> Output files are never branded or stamped with watermarks. Your documents remain yours.
             </li>
             <li>
-              <strong className="text-foreground">Uncompromising Privacy:</strong> We prioritize your data security. Many of our tools process files locally within your browser. For tools requiring server processing, files are encrypted during transit and automatically permanently deleted from our servers immediately after processing.
+              <strong className="text-foreground">Transparent Processing:</strong> The current PDF, image, and text utilities process selected content in your browser. Contact form messages are sent to our email delivery provider when the service is configured.
             </li>
           </ul>
         </section>
@@ -90,10 +90,9 @@ export default function AboutPage() {
             slow websites just to resize an image or merge a PDF. 
           </p>
           <p>
-            To keep our servers running and continue offering these premium-grade tools to students, 
-            creatives, and professionals worldwide at no cost, our platform is supported by carefully 
-            selected, non-intrusive advertising. This ensures we can maintain high-speed infrastructure 
-            and add new tools regularly without ever charging our users.
+            The website is available without a paid account. Advertising may be displayed if and when
+            the relevant advertising service is enabled. Any advertising is intended to remain separate
+            from the file upload, conversion, and download controls.
           </p>
         </section>
 

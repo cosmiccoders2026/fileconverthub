@@ -51,13 +51,13 @@ export default function HomePage() {
         <PageContainer className="py-16 md:py-24">
           <div className="mx-auto max-w-4xl text-center space-y-6">
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-balance">
-              Free Online PDF, Image & Text Conversion Tools
+              Simple, Reliable Online File Conversion and Text Tools
             </h1>
 
             <p className="text-lg text-muted-foreground text-balance">
-              Convert, compress, merge, resize, and clean files instantly with
-              FileConvertHub. Use free online PDF tools, image tools, and text
-              tools directly in your browser with no signup.
+              Convert, compress, resize, and organize everyday files with
+              straightforward PDF, image, and text utilities. Choose a tool,
+              add your file or text, and review the result — no account required.
             </p>
 
             <div className="relative mx-auto max-w-md">
@@ -100,7 +100,7 @@ export default function HomePage() {
       </section>
 
       <PageContainer>
-        <h2 className="mb-6 text-2xl font-bold">Browse Free Online Tools by Category</h2>
+        <h2 className="mb-6 text-2xl font-bold">Explore the tools</h2>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => {
