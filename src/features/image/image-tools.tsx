@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { FileDropzone } from "@/components/shared/file-dropzone";
 import { ToolStatus } from "@/components/shared/tool-status";
@@ -308,7 +309,6 @@ export function ResizeImageTool() {
   );
 }
 
-
 export function CompressImageTool() {
   const [files, setFiles] = useState<File[]>([]);
   const [quality, setQuality] = useState(0.7);
@@ -548,73 +548,6 @@ export function CompressImageTool() {
         {status === "processing"
           ? "Compressing Images..."
           : `Compress ${files.length || ""} Images`}
-      </Button>
-    </ImageToolWrapper>
-  );
-}
-
-
-  const estimatedSize =
-    files.length > 0 ? estimateCompressedSize(files[0].size, quality) : 0;
-
-  return (
-    <ImageToolWrapper title="Compress Image File Size">
-      <FileDropzone
-        accept="image/*"
-        multiple
-        maxFiles={350}
-        files={files}
-        onFilesChange={(f: File[]) => {
-          setFiles(f);
-          setStatus("idle");
-          setError(null);
-          setProgress("");
-        }}
-        label="Select images to compress"
-        hint="Adjust compression factor to reduce file weight while maintaining legibility."
-      />
-
-      <div className="space-y-2 p-3 rounded-md border border-slate-200 bg-slate-50/50">
-        <div className="flex justify-between text-xs">
-          <Label className="text-slate-700 font-medium">Compression Factor</Label>
-          <span className="font-mono text-slate-600 tabular-nums">
-            {Math.round(quality * 100)}%
-          </span>
-        </div>
-        <input
-          type="range"
-          min={0.3}
-          max={1}
-          step={0.05}
-          value={quality}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setQuality(parseFloat(e.target.value))
-          }
-          className="w-full accent-blue-600"
-        />
-
-        {files.length > 0 && (
-          <p className="text-[11px] text-slate-500 font-mono tabular-nums pt-1 border-t border-slate-200/60">
-            First file original: {formatFileSize(files[0].size)} → Est. result: ~
-            {formatFileSize(estimatedSize)}
-          </p>
-        )}
-      </div>
-
-      {progress && (
-        <p className="text-xs text-slate-500 font-mono tabular-nums" aria-live="polite">
-          {progress}
-        </p>
-      )}
-
-      <ToolStatus status={status} error={error} />
-
-      <Button
-        onClick={handleCompress}
-        disabled={files.length === 0 || status === "processing"}
-        className="w-full"
-      >
-        {status === "processing" ? "Compressing Images..." : "Compress Images"}
       </Button>
     </ImageToolWrapper>
   );
